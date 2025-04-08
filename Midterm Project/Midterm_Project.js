@@ -123,7 +123,7 @@ for (let i = this.trail.length - 10; i >= 0; i--) {
     
     function draw() {
       if (scene == 1){
-        background(240,map(rectHeight,800,400,255,0),map(rectHeight,800,400,255,0));
+        background(240,map(rectHeight,800,400,255,0),map(rectHeight,800,400,255,0)); //background changes colors to red to show panic as the square gets smaller
         if (rectWidth,rectHeight >= radius *3){
           rectX = (windowWidth - rectWidth) /2;
           rectY = (windowHeight - rectHeight)/2;
@@ -136,7 +136,7 @@ for (let i = this.trail.length - 10; i >= 0; i--) {
         
         noFill();
         push();
-        strokeWeight(2);
+        strokeWeight(5);
         rect(rectX, rectY, rectWidth, rectHeight);
         pop();
 
@@ -150,8 +150,8 @@ for (let i = this.trail.length - 10; i >= 0; i--) {
         }
 
         if (myCircle.keepInRect(rectX, rectY, rectWidth, rectHeight)) {
-            rectWidth -= 1;
-            rectHeight -= 1;
+            rectWidth -= 1.5;
+            rectHeight -= 1.5;
         }
         if(myCircle.isInsideRect(rectX,rectY,rectWidth,rectHeight)){
           rectWidth -= 0.35;
@@ -296,3 +296,5 @@ function mousePressed() { // easy way to move through the scenes
     scene = 1; // Reset to the first scene
   }
 }
+
+//The adjective is Trapped
