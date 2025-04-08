@@ -1,28 +1,29 @@
-let scene = 1
-let rectX,rectY,rectWidth,rectHeight
-let edgeCircles = []
-let radius = 50;
-let myCircle;
-let eye1;
+// move the mouse to interact with the project, try and escape the different situations
+let scene = 1 // first scene
+let rectX,rectY,rectWidth,rectHeight // controls rectangle dimensions and location
+let edgeCircles = [] // array of circles that appear in square in scene 1
+let radius = 50; // radius of circles in scene 1
+let myCircle; // main circle that follows the mouse locations
+let eye1; // eyes from scene 2
 let eye2;
-let totalScenes = 3;
-let eyeStress = [];
+let totalScenes = 3;//helps reset the sceness
+let eyeStress = []; //eyes being stressed in scene 2
 let eyeStress2 = [];
 let sceneStartFrame = 0; // Variable to track when scene 2 starts
 
-class Circle {
-  constructor(x, y, radius,fillColor = 0, strokeColor = null) {
+class Circle { // circle class
+  constructor(x, y, radius,fillColor = 0, strokeColor = null) { //take the location of the circle, and its fill and stroke color
     this.x = x;
     this.y = y;
     this.radius = radius;
-    this.trail =[];
-    if (scene == 1){
-      let r = map(rectWidth, 800, 400, 0, 255);
+    this.trail =[]; //array to store the trailing circles
+    if (scene == 1){ // howw ths troke color is made
+      let r = map(rectWidth, 800,600, 0, 255); // stroke color is linked to size of rectangle and becomes red as it gets smaller
       let g = 0;
-      let b = map(rectWidth, 800, 200, 255, 0);
+      let b = map(rectWidth, 800, 400, 255, 0);
       this.strokeColor = color(r, g, b);
     }
-    else{
+    else{ // for scene 2 the stroke color is red to show the panicked eyes
       let r = 255;
       let g = 0;
       let b = 0
@@ -30,14 +31,14 @@ class Circle {
     }
   }
 
-  isInsideRect(rectX, rectY, rectWidth, rectHeight) {
+  isInsideRect(rectX, rectY, rectWidth, rectHeight) { // checks to see if the circle is inside the rectangle
     return this.x > rectX + this.radius && this.x < rectX + rectWidth - this.radius &&
            this.y > rectY + this.radius && this.y < rectY + rectHeight - this.radius;
 }
 
-  keepInRect(rectX, rectY, rectWidth, rectHeight) {
+  keepInRect(rectX, rectY, rectWidth, rectHeight) { // makes sure that all the circles stay inside the shrinking rectangle
     let touchedEdge = false;
-    if (this.x - this.radius < rectX) {
+    if (this.x - this.radius < rectX) { //if statements determining if the circle touched the edge
       this.x = rectX + this.radius;
       touchedEdge = true;
     } else if (this.x + this.radius > rectX + rectWidth) {
@@ -52,12 +53,11 @@ class Circle {
       touchedEdge = true;
     }
     if (touchedEdge) {
-      edgeCircles.push(new Circle(this.x, this.y, this.radius,null,this.strokeColor));
+      edgeCircles.push(new Circle(this.x, this.y, this.radius,null,this.strokeColor)); // if the main circle touches the edge then a copy of it is made and added to the edge circles array
     }
   return touchedEdge;
   }
-  updatePosition(rectX, rectY, rectWidth, rectHeight) {
-    // Adjust the position of the circle relative to the shrinking rectangle
+  updatePosition(rectX, rectY, rectWidth, rectHeight) { // Adjust's the position of the circle relative to the shrinking rectangle
     if (this.x - this.radius < rectX) {
       this.x = rectX + this.radius;
   } else if (this.x + this.radius > rectX + rectWidth) {
@@ -69,37 +69,37 @@ class Circle {
       this.y = rectY + rectHeight - this.radius;
   }
 }
-updateTrail() {
+updateTrail() { //updates the trail that follows the main circle and fades them out
 if(this.isInsideRect(rectX,rectY,rectWidth,rectHeight)){
-  this.trail.push({ x: this.x, y: this.y, color: this.strokeColor, alpha: 255 });
+  this.trail.push({ x: this.x, y: this.y, color: this.strokeColor, alpha: 200 });
 }
 for (let i = this.trail.length - 10; i >= 0; i--) {
     if (!this.trail[i]) continue; // Skip undefined entries
     this.trail[i].alpha -= 50;
     if (this.trail[i].alpha <= 100) {
-        this.trail.splice(i, 1);
+        this.trail.splice(i, 1); // splice is used to remove the trail circles as they go so that they don't become infinite
     }
 }
 }
-  drawCircle() {
+  drawCircle() { // method that draws the circle depending on certain conditions
     this.updateTrail();
     push();
     strokeWeight(5);
-    if (scene ==1){
+    if (scene ==1){ // if in scene 1, it draws the trail circles and main circle with these parameters
       for(let t of this.trail){
         stroke(red(t.color), green(t.color), blue(t.color), t.alpha);
         ellipse(t.x,t.y,this.radius *2);
       }
     }
-    else{
+    else{ //if scene 2, it removes the fill and puts the stroke color inputed in the draw functions
       noFill();
       stroke(this.strokeColor);
     }
-    ellipse(this.x, this.y, this.radius * 2);
+    ellipse(this.x, this.y, this.radius * 2); //draws the circle using given parameters
     pop();
 
   }
-  drawEdgeCircles(){
+  drawEdgeCircles(){ // this method draws the edge circles when the the main circle touches the edge
     push();
     strokeWeight(5);
     stroke(this.strokeColor)
@@ -108,7 +108,7 @@ for (let i = this.trail.length - 10; i >= 0; i--) {
   }
 }
 
-  function setup() {
+  function setup() { // initalizes the window, rectangle size in scene 1, main circle and the arrays for the stressed eyes
       createCanvas(windowWidth,windowHeight);
       background(255);
       rectWidth = 850;
@@ -179,27 +179,27 @@ function drawJailScene() {
   let redValue = map(sin(frameCount * 0.08), -1, 1, 0, 255); // Oscillates between 0 and 255
   background(redValue, 0, 0); // Set the background color to cycle between black and red
 
-  // Define the rectangle for the jail scene
+  // Defines the rectangle for the jail scene
   let jailX = 0;
   let jailY = 0;
   let jailWidth = width;
   let jailHeight = height;
 
-  // Draw the jail rectangle
+  // Draws the jail rectangle
   noFill();
   stroke(255);
   strokeWeight(5);
   rect(jailX, jailY, jailWidth, jailHeight);
 
-  // Define eye properties
+  // Defines eye properties
   let eyeX = jailX + jailWidth / 2;
   let eyeY = jailY + jailHeight / 2;
   let eyeSize = 500; // Eye size
   let pupilSize = 75; // Pupil size
   let eyeSpacing = 600;
 
-  // Draw eyes
-  fill(255); // White eyes
+  // Draws eyes
+  fill(255); 
   noStroke();
   let leftEyeX = eyeX - eyeSpacing / 2;
   let rightEyeX = eyeX + eyeSpacing / 2;
@@ -209,21 +209,21 @@ function drawJailScene() {
 
   // Draw pupils constrained to move near the center of the eyes
   fill(50); // Black pupils
-  let pupilMovementRadius = eyeSize / 6; // Limit pupil movement to a smaller radius near the center
+  let pupilMovementRadius = eyeSize / 6; // Limit pupil movement to a smaller radius near the center rather than the perimeter of circle
 
-  let angleLeft = atan2(mouseY - eyeY, mouseX - leftEyeX);
+  let angleLeft = atan2(mouseY - eyeY, mouseX - leftEyeX); // calculates the angle between the mouse position and the center of the eyes
   let angleRight = atan2(mouseY - eyeY, mouseX - rightEyeX);
 
+  // moves the pupil constrained by the pupil movement radius around the center of the eye by using the angle calculated above
   let pupilXLeft = leftEyeX + pupilMovementRadius * cos(angleLeft);
   let pupilYLeft = eyeY + pupilMovementRadius * sin(angleLeft);
-
   let pupilXRight = rightEyeX + pupilMovementRadius * cos(angleRight);
   let pupilYRight = eyeY + pupilMovementRadius * sin(angleRight);
 
   ellipse(pupilXLeft, pupilYLeft, pupilSize, pupilSize); // Left pupil
   ellipse(pupilXRight, pupilYRight, pupilSize, pupilSize); // Right pupil
 
-  // Draw stress circles on each eye
+  // uses noise and the circle class to Draw the stress circles on each eye
   for (let i = 0; i < eyeStress.length; i++) {
     let stressCircle = eyeStress[i];
 
@@ -264,7 +264,7 @@ function drawJailScene() {
     eyeStress2.push(newCircleRight);
   }
 
-  // Limit the number of stress circles to avoid performance issues
+  // Limit the number of stress circles so that it runs smoothly
   if (eyeStress.length > 10) {
     eyeStress.shift(); // Remove the oldest circle from the left eye
   }
@@ -281,7 +281,7 @@ function drawJailScene() {
     line(i, jailY, i, jailY + jailHeight); // Vertical bars
   }
 
-  // Reset to scene 1 after 10 seconds (600 frames at 60 FPS)
+  // Reset to scene 1 after about 6 seconds (400 frames at 60 FPS)
   if (frameCount - sceneStartFrame > 400) {
     scene = 1; // Reset to scene 1
     sceneStartFrame = 0; // Reset the scene start frame
@@ -290,7 +290,7 @@ function drawJailScene() {
 
 
 
-function mousePressed() {
+function mousePressed() { // easy way to move through the scenes 
   scene++;
   if (scene > totalScenes) {
     scene = 1; // Reset to the first scene
